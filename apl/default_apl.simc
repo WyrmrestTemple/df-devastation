@@ -15,6 +15,15 @@ actions.precombat+=/firestorm,if=talent.firestorm
 actions.precombat+=/living_flame,if=!talent.firestorm
 
 
+# Executed before combat begins. Accepts non-harmful actions only.
+actions.precombat=flask
+actions.precombat+=/food
+actions.precombat+=/augmentation
+actions.precombat+=/snapshot_stats
+actions.precombat+=/use_item,name=shadowed_orb_of_torment
+actions.precombat+=/firestorm,if=talent.firestorm
+actions.precombat+=/living_flame,if=!talent.firestorm
+
 # Executed every time the actor is available.
 actions=potion,if=buff.dragonrage.up|time>=300&fight_remains<35
 actions+=/use_item,name=shadowed_orb_of_torment
@@ -33,10 +42,9 @@ actions+=/eternity_surge,empower_to=2,if=spell_targets.pyre>(1+talent.eternitys_
 actions+=/eternity_surge,empower_to=1,if=(cooldown.eternity_surge.duration-cooldown.dragonrage.remains)<(buff.dragonrage.duration+6-gcd.max)
 actions+=/deep_breath,if=spell_targets.deep_breath>1&buff.dragonrage.down
 actions+=/shattering_star,if=!talent.arcane_vigor|essence+1<essence.max|buff.dragonrage.up
-actions+=/living_flame,if=essence<essence.max&!buff.essence_burst.stack&buff.burnout.up&buff.leaping_flames.up&buff.dragonrage.up&talent.shattering_star&debuff.shattering_star_debuff.up
-actions+=/living_flame,if=essence<essence.max&!buff.essence_burst.stack&buff.burnout.up&(buff.leaping_flames.up&buff.dragonrage.up|spell_targets.pyre<=3)
-actions+=/pyre,if=spell_targets.pyre>(2+talent.scintillation*talent.eternitys_span)|buff.charged_blast.stack=buff.charged_blast.max_stack&cooldown.dragonrage.remains>20&(spell_targets.pyre>=3&!talent.volatility|spell_targets.pyre>=2&talent.volatility)
-actions+=/pyre,if=(cooldown.dragonrage.remains>=10|buff.charged_blast.stack=20)&spell_targets.pyre>=4
+actions+=/living_flame,if=essence<essence.max&!buff.essence_burst.stack&buff.burnout.up&(buff.leaping_flames.up&buff.dragonrage.up|talent.shattering_star&debuff.shattering_star_debuff.remains<=1|spell_targets.pyre<=3)
+actions+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>(2+talent.scintillation*talent.eternitys_span)|buff.charged_blast.stack=buff.charged_blast.max_stack&cooldown.dragonrage.remains>20&spell_targets.pyre>=(3-talent.volatility)
+actions+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=4
 actions+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre=3&buff.charged_blast.stack>=15
 actions+=/pyre,if=cooldown.dragonrage.remains>=10&talent.volatility&spell_targets.pyre>2
 actions+=/azure_strike,if=essence<essence.max&!buff.burnout.up&spell_targets.azure_strike>(2-buff.dragonrage.up)&buff.essence_burst.stack<buff.essence_burst.max_stack&(!talent.ruby_embers|spell_targets.azure_strike>2)
