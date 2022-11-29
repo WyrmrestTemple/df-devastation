@@ -42,13 +42,10 @@ actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.es
 actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down|buff.snapfire.up
 # Spend burnout procs without overcapping resources
 actions.st+=/living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1
-# Always clip Disintegrate inside DR
-actions.st+=/azure_strike,if=buff.dragonrage.up&essence<3&!buff.essence_burst.up
-# Outside of DR pool 6 seconds before SS unless it would result in overcapping resources TODO: revisit conditions + merge with other disint action
-actions.st+=/disintegrate,chain=1,if=!buff.dragonrage.up&(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
-# In DR chain/clip after the 3rd damage tick, pool 1-2 GCDs before SS is ready
-actions.st+=/disintegrate,chain=1,early_chain_if=ticks>=2,interrupt_if=ticks>=2,if=buff.dragonrage.up&(!talent.shattering_star|cooldown.shattering_star.remains>(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max)
-actions.st+=/azure_strike,if=buff.dragonrage.up
+# Ensure we clip Disintegrate inside DR even with our fillers, Pool 1-2 GCDs before SS is up inside DR
+actions.st+=/azure_strike,if=buff.dragonrage.up&(essence<3&!buff.essence_burst.up|(talent.shattering_star&cooldown.shattering_star.remains<=(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max))
+# In DR chain/clip after the 3rd damage tick, Outside of DR pool 6 seconds before SS unless it would result in overcapping resources TODO: revisit pooling conditions
+actions.st+=/disintegrate,chain=1,early_chain_if=buff.dragonrage.up&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2,if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence>essence.max-1|buff.essence_burst.stack==buff.essence_burst.max_stack)
 actions.st+=/deep_breath,if=!buff.dragonrage.up&spell_targets.deep_breath>1
 actions.st+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
 actions.st+=/living_flame
