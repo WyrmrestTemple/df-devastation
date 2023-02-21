@@ -74,6 +74,7 @@ actions.aoe+=/azure_strike,if=cooldown.dragonrage.remains<gcd.max*6&cooldown.fir
 actions.aoe+=/pyre,if=talent.volatility&buff.charged_blast.stack>=10
 actions.aoe+=/pyre,if=talent.volatility&spell_targets.pyre>=4
 actions.aoe+=/living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up
+actions.aoe+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=6
 actions.aoe+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=5&buff.charged_blast.stack>=3
 actions.aoe+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre>=4&buff.charged_blast.stack>=12
 actions.aoe+=/pyre,if=cooldown.dragonrage.remains>=10&spell_targets.pyre=3&buff.charged_blast.stack>=16
