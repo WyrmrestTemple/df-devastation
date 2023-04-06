@@ -105,6 +105,8 @@ actions.st+=/living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essen
 actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|buff.burnout.up|cooldown.fire_breath.up|cooldown.eternity_surge.up),if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack)
 actions.st+=/deep_breath,if=!buff.dragonrage.up&spell_targets.deep_breath>1
 actions.st+=/living_flame
+# Fallback for movement
+actions.st+=/azure_strike
 
 # Try and get spoils to prvide haste or mastery stats, but if dragonrage gets too short just use it anyway.
 actions.trinkets=use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(buff.spoils_of_neltharus_mastery.up|buff.spoils_of_neltharus_haste.up|buff.dragonrage.remains+6*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18)|fight_remains<=20
