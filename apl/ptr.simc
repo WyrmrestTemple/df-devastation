@@ -1,3 +1,4 @@
+
 # This default action priority list is automatically created based on your character.
 # It is a attempt to provide you with a action list that is both simple and practicable,
 # while resulting in a meaningful and good simulation. It may not result in the absolutely highest possible dps.
@@ -80,19 +81,19 @@ actions.fb+=/fire_breath,empower_to=2,if=(14+2*talent.blast_furnace.rank)+dot.fi
 actions.fb+=/fire_breath,empower_to=3,if=(8+2*talent.blast_furnace.rank)+dot.fire_breath_damage.remains<(20+2*talent.blast_furnace.rank)*1.3|!talent.font_of_magic|buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste
 actions.fb+=/fire_breath,empower_to=4
 
-# ST Action List, it's a mess
+# ST Action List, it's a mess, but it's getting better!
 actions.st=use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
+# Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10|fight_remains<30
-# Use to extend DR when an empower cast won't fit inside the DR window anymore. When running FTF use on ES at the start of DR to maximize uses
-#actions.st+=/tip_the_scales,if=buff.dragonrage.up&(buff.dragonrage.remains<variable.r1_cast_time&(buff.dragonrage.remains>cooldown.fire_breath.remains|buff.dragonrage.remains>cooldown.eternity_surge.remains)|talent.feed_the_flames&!cooldown.fire_breath.up)
 actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>13|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
-actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack
+# Throw Star on CD, Don't overcap with Arcane Vigor.
+actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
+# Tip Eternity Surge in DR For more DPS by shortening the cast
 actions.st+=/tip_the_scales,if=buff.dragonrage.up&cooldown.eternity_surge.up&!cooldown.fire_breath.up
 actions.st+=/call_action_list,name=es,if=(!talent.dragonrage|variable.next_dragonrage>13|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
 # Wait for FB/ES to be ready if spending another GCD would result in the cast no longer fitting inside of DR
 actions.st+=/wait,sec=cooldown.fire_breath.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time*buff.tip_the_scales.down&buff.dragonrage.remains-cooldown.fire_breath.remains>=variable.r1_cast_time*buff.tip_the_scales.down
 actions.st+=/wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time&buff.dragonrage.remains-cooldown.eternity_surge.remains>variable.r1_cast_time*buff.tip_the_scales.down
-# Wait for 2 EBs to use SS while inside DR, otherwise use on CD
 # Spend the last 1 or 2 GCDs of DR on fillers to exit with 2 EBs
 actions.st+=/living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
 actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
@@ -100,9 +101,7 @@ actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.es
 actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down|buff.snapfire.up
 # Spend burnout procs without overcapping resources
 actions.st+=/living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1
-# Ensure we clip Disintegrate inside DR even with our fillers, Pool 1-2 GCDs before SS is up inside DR
-actions.st+=/azure_strike,if=buff.dragonrage.up&(essence<3&!buff.essence_burst.up)
-# In DR chain/clip after the 3rd damage tick, Outside of DR pool 6 seconds before SS unless it would result in overcapping resources TODO: revisit pooling conditions
+# In DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons.
 actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|buff.burnout.up|cooldown.fire_breath.up|cooldown.eternity_surge.up),if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack)
 actions.st+=/deep_breath,if=!buff.dragonrage.up&spell_targets.deep_breath>1
 actions.st+=/living_flame
