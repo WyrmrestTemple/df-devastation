@@ -34,6 +34,9 @@ actions=potion,if=buff.dragonrage.up|fight_remains<35
 actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
 # Invoke External Power Infusions if they're available during dragonrage
 actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up
+actions+=/living_flame,if=(raid_event.movement.in<2)&spell_targets.pyre<=2&!buff.hover.up&cooldown.hover.ready&buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)
+actions+=/azure_strike,if=(raid_event.movement.in<2)&spell_targets.pyre<=2&!buff.hover.up&cooldown.hover.ready
+actions+=/hover,use_off_gcd=1,if=(raid_event.movement.in<2)&spell_targets.pyre<=2&!buff.hover.up
 actions+=/call_action_list,name=trinkets
 actions+=/run_action_list,name=aoe,if=spell_targets.pyre>=3
 actions+=/run_action_list,name=st
@@ -69,14 +72,14 @@ actions.aoe+=/firestorm
 # Pyre on 3T, currently a small gain (0.1%) to play around blue buff in 3T so including that
 actions.aoe+=/pyre,if=talent.volatility&(spell_targets.pyre>=4|(!buff.iridescence_blue.up&spell_targets.pyre==3))
 # Cast LF with burnout proc and leaping flames up as long as you have 0 EB
-actions.aoe+=/living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up
+actions.aoe+=/living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Pyre logic without volatility.
 # Without Vola use pyre if raging debuff is active, or if on 3T with 3 stacks of CB, or if 4T+
 actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(spell_targets.pyre==3&buff.charged_blast.stack>=3)|spell_targets.pyre>=4
 # Use staff on 5T or below
 actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&spell_targets.pyre<=5
 # Yoinked the disintegrate logic from ST
-actions.aoe+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=3&(cooldown.shattering_star.up|(buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up),if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack)
+actions.aoe+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=(buff.dragonrage.up&ticks>=3&(cooldown.shattering_star.up|(buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up))&(raid_event.movement.in>2|buff.hover.up),if=(buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack))&(raid_event.movement.in>2|buff.hover.up)
 # Cast LF with burnout and snapfire(kekW) proc for those juicy insta firestorms
 actions.aoe+=/living_flame,if=talent.snapfire&buff.burnout.up
 # Fallback filler
@@ -119,9 +122,9 @@ actions.st+=/wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.d
 actions.st+=/living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
 actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
 # Spend burnout procs without overcapping resources
-actions.st+=/living_flame,if=buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1
-# In DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons.
-actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2,interrupt_if=buff.dragonrage.up&ticks>=3&(cooldown.shattering_star.up|(buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up),if=buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack)
+actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence<essence.max-1 
+# In DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement
+actions.st+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=(buff.dragonrage.up&ticks>=3&(cooldown.shattering_star.up|(buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up))&(raid_event.movement.in>2|buff.hover.up),if=(buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack))&(raid_event.movement.in>2|buff.hover.up)
 # Hard cast only outside of SS and DR windows, always spend snapfire procs
 actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down|buff.snapfire.up
 actions.st+=/deep_breath,if=!buff.dragonrage.up&spell_targets.deep_breath>1
