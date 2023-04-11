@@ -51,15 +51,9 @@ actions.aoe=dragonrage
 actions.aoe+=/variable,name=dr_prep_time_aoe,value=4
 # Use tip to get that sweet aggro
 actions.aoe+=/tip_the_scales,if=buff.dragonrage.up&(spell_targets.pyre<=6|!cooldown.fire_breath.up)
-# Fire breath logic TODO: Implement into call list? idk; that thing is a mess.
-# Cast R1 only if needed to extend
-actions.aoe+=/fire_breath,empower_to=1,if=buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste&cooldown.dragonrage.remains>variable.dr_prep_time_aoe
-# Cast R2 only if needed to extend
-actions.aoe+=/fire_breath,empower_to=2,if=buff.dragonrage.remains<2.5*spell_haste&buff.dragonrage.remains>=1.75*spell_haste&cooldown.dragonrage.remains>variable.dr_prep_time_aoe
-# Cast R3 if not running font and won't override shards buff outside of DR or if needed to extend
-actions.aoe+=/fire_breath,empower_to=3,if=(!talent.font_of_magic&cooldown.dragonrage.remains>variable.dr_prep_time_aoe&((buff.blazing_shards.remains<variable.r1_cast_time)|buff.dragonrage.up))|(buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste)
-# Cast R4 as long as it doesn't override shard buff outside of DR.
-actions.aoe+=/fire_breath,empower_to=4,if=cooldown.dragonrage.remains>1&((buff.blazing_shards.remains<variable.r1_cast_time)|buff.dragonrage.up)
+# Cast Fire Breath
+actions.aoe+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
+# Cast Eternity Surge
 actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.blazing_shards.remains<variable.r1_cast_time)
 # Cast DB if not in DR and not running imminent destruction. - I'm assuming that casting DB inside of DR with imminent before you start spending should be an increase, but might be worth to save it for outside of DR for more value?
 actions.aoe+=/deep_breath,if=!buff.dragonrage.up
@@ -91,10 +85,10 @@ actions.es+=/eternity_surge,empower_to=2,if=spell_targets.pyre<=2+2*talent.etern
 actions.es+=/eternity_surge,empower_to=3,if=spell_targets.pyre<=3+3*talent.eternitys_span|!talent.font_of_magic|buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste
 actions.es+=/eternity_surge,empower_to=4
 
-# Use Firebreath with some really weird criteria. Override it for st because its not actually useful? Idk. TODO: Someone look at this it's a mess.
-actions.fb=fire_breath,empower_to=1,if=(20+2*talent.blast_furnace.rank)+dot.fire_breath_damage.remains<(20+2*talent.blast_furnace.rank)*1.3|buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste|active_enemies<=2&!talent.everburning_flame|buff.dragonrage.up
-actions.fb+=/fire_breath,empower_to=2,if=(14+2*talent.blast_furnace.rank)+dot.fire_breath_damage.remains<(20+2*talent.blast_furnace.rank)*1.3|buff.dragonrage.remains<2.5*spell_haste&buff.dragonrage.remains>=1.75*spell_haste|!debuff.in_firestorm.up&talent.everburning_flame|!talent.firestorm
-actions.fb+=/fire_breath,empower_to=3,if=(8+2*talent.blast_furnace.rank)+dot.fire_breath_damage.remains<(20+2*talent.blast_furnace.rank)*1.3|!talent.font_of_magic|buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste|debuff.in_firestorm.up&talent.everburning_flame
+# Fire Breath, use rank appropriate to target count/talents.
+actions.fb=fire_breath,empower_to=1,if=(buff.dragonrage.up&spell_targets.pyre<=2)|(spell_targets.pyre=1&!talent.everburning_flame)|(buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste)
+actions.fb+=/fire_breath,empower_to=2,if=(!debuff.in_firestorm.up&talent.everburning_flame&spell_targets.pyre<=3)|(spell_targets.pyre=2&!talent.everburning_flame)|(buff.dragonrage.remains<2.5*spell_haste&buff.dragonrage.remains>=1.75*spell_haste)
+actions.fb+=/fire_breath,empower_to=3,if=!talent.font_of_magic|spell_targets.pyre<=2|(debuff.in_firestorm.up&talent.everburning_flame&spell_targets.pyre<=3)|(buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste)
 actions.fb+=/fire_breath,empower_to=4
 
 # ST Action List, it's a mess, but it's getting better!
@@ -104,12 +98,7 @@ actions.st+=/variable,name=dr_prep_time_st,value=13
 # Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10|fight_remains<30
 actions.st+=/deep_breath,if=!buff.dragonrage.up&talent.imminent_destruction&!debuff.shattering_star_debuff.up
-actions.st+=/call_action_list,name=fb,if=talent.everburning_flame&((!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))
-# The FB logic below is an increase in 2T, but with EBF it loses out to the current logic - TODO: implement into calllist, but that thing is a mess
-actions.st+=/fire_breath,empower_to=1,if=buff.blazing_shards.remains<variable.r1_cast_time&(spell_targets.pyre=1|spell_targets.pyre=2&buff.dragonrage.up)&variable.next_dragonrage>variable.dr_prep_time_st
-actions.st+=/fire_breath,empower_to=2,if=buff.blazing_shards.remains<variable.r1_cast_time&spell_targets.pyre<=2&variable.next_dragonrage>variable.dr_prep_time_st
-actions.st+=/fire_breath,empower_to=3,if=buff.blazing_shards.remains<variable.r1_cast_time&!(talent.font_of_magic|spell_targets.pyre<=2)&variable.next_dragonrage>variable.dr_prep_time_st
-actions.st+=/fire_breath,empower_to=4,if=buff.blazing_shards.remains<variable.r1_cast_time&variable.next_dragonrage>variable.dr_prep_time_st
+actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
 # Throw Star on CD, Don't overcap with Arcane Vigor.
 actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
 # Tip Eternity Surge in DR For more DPS by shortening the cast
