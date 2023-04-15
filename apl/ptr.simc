@@ -68,7 +68,7 @@ actions.aoe+=/pyre,if=talent.volatility&(active_enemies>=4|(!buff.iridescence_bl
 actions.aoe+=/living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Pyre logic without volatility.
 # Without Vola use pyre if raging debuff is active, or if on 3T with 3 stacks of CB, or if 4T+
-actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=3)|active_enemies>=4
+actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
 # Use staff on 5T or below
 actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
 # Yoinked the disintegrate logic from ST
