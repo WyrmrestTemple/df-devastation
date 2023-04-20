@@ -41,8 +41,6 @@ actions+=/run_action_list,name=aoe,if=active_enemies>=3
 actions+=/run_action_list,name=st
 
 # AOE action list; Actually kinda clean now
-# TODO: Deep Breath logic needs some work, Imminent defo bugged in sim rn, so it will have to wait
-#actions.aoe=deep_breath,if=talent.imminent_destruction
 # Send DR on CD with no regard to the safety of the mobs - DPS loss to hold DR for empowers, in real world scenario maybe you hold if you are going for longer DRs
 actions.aoe=dragonrage,if=target.time_to_die>=32|fight_remains<30
 # Variables for AoE / Testing
@@ -56,14 +54,13 @@ actions.aoe+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_drag
 actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.blazing_shards.remains<variable.r1_cast_time)
 # Cast DB if not in DR and not running imminent destruction. - I'm assuming that casting DB inside of DR with imminent before you start spending should be an increase, but might be worth to save it for outside of DR for more value?
 actions.aoe+=/deep_breath,if=!buff.dragonrage.up
-#actions.aoe+=/deep_breath,if=!buff.dragonrage.up&!talent.imminent_destruction
 # Send SS when it doesn't overflow EB, without vigor send on CD
 actions.aoe+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
 # Cast Firestorm before spending ressources
 actions.aoe+=/firestorm
 # Pyre logic with volatility.
-# Pyre on 3T, currently a small gain (0.1%) to play around blue buff in 3T so including that
-actions.aoe+=/pyre,if=talent.volatility&(active_enemies>=4|(!buff.iridescence_blue.up&active_enemies==3))
+# Pyre on 3T+
+actions.aoe+=/pyre,if=talent.volatility&active_enemies>=3
 # Cast LF with burnout proc and leaping flames up as long as you have 0 EB
 actions.aoe+=/living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Pyre logic without volatility.
@@ -95,11 +92,12 @@ actions.st=use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff
 # Movement Logic, Time spiral logic might need some tweaking
 #actions.st+=/time_spiral,if=raid_event.movement.in<3&cooldown.hover.remains>=3&!buff.hover.up
 actions.st+=/hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
+# Spend firestorm procs ASAP
+actions.st+=/firestorm,if=buff.snapfire.up
 # Variable for when to start holding empowers.
 actions.st+=/variable,name=dr_prep_time_st,value=13
 # Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
-actions.st+=/deep_breath,if=!buff.dragonrage.up&talent.imminent_destruction&!debuff.shattering_star_debuff.up
 actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
 # Throw Star on CD, Don't overcap with Arcane Vigor.
 actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
@@ -114,12 +112,15 @@ actions.st+=/living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.es
 actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
 # Spend burnout procs without overcapping resources
 actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence<essence.max-1
+# Spend pyre if raging inferno debuff is active and you have 20 stacks of CB on 2T
+actions.st+=/pyre,if=debuff.in_firestorm.up&talent.raging_inferno&buff.charged_blast.stack==20&active_enemies>=2
 # In DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement
 actions.st+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=(buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|(buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up))&(raid_event.movement.in>2|buff.hover.up),if=(buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack))&(raid_event.movement.in>2|buff.hover.up)
-# Hard cast only outside of SS and DR windows, always spend snapfire procs
-actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down|buff.snapfire.up
-# Use Deep Breath on 2T, unless adds will come before it'll be ready again
+# Hard cast only outside of SS and DR windows
+actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
+# Use Deep Breath on 2T, unless adds will come before it'll be ready again or if talented ID.
 actions.st+=/deep_breath,if=!buff.dragonrage.up&active_enemies>=2&((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
+actions.st+=/deep_breath,if=!buff.dragonrage.up&talent.imminent_destruction&!debuff.shattering_star_debuff.up
 actions.st+=/living_flame
 # Fallback for movement
 actions.st+=/azure_strike
