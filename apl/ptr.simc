@@ -41,17 +41,20 @@ actions+=/run_action_list,name=aoe,if=active_enemies>=3
 actions+=/run_action_list,name=st
 
 # AOE action list; Actually kinda clean now
-# Send DR on CD with no regard to the safety of the mobs - DPS loss to hold DR for empowers, in real world scenario maybe you hold if you are going for longer DRs
-actions.aoe=dragonrage,if=target.time_to_die>=32|fight_remains<30
 # Variables for AoE / Testing
 # This variable controls when you should start holding empowers for upcoming DR. - From my testing 4sec seems like the sweetspot, but it's very minor diff so far - Holding for more than 6 seconds it begins to become a loss.
-actions.aoe+=/variable,name=dr_prep_time_aoe,value=4
+actions.aoe=variable,name=dr_prep_time_aoe,value=4
+# Send DR on CD with no regard to the safety of the mobs - DPS loss to hold DR for empowers, in real world scenario maybe you hold if you are going for longer DRs
+# DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
+actions.aoe+=/dragonrage,if=target.time_to_die>=32|fight_remains<30
 # Use tip to get that sweet aggro
 actions.aoe+=/tip_the_scales,if=buff.dragonrage.up&(active_enemies<=3+3*talent.eternitys_span|!cooldown.fire_breath.up)
 # Cast Fire Breath
-actions.aoe+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
+# DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
+actions.aoe+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
 # Cast Eternity Surge
-actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.blazing_shards.remains<variable.r1_cast_time)
+# DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
+actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
 # Cast DB if not in DR and not running imminent destruction. - I'm assuming that casting DB inside of DR with imminent before you start spending should be an increase, but might be worth to save it for outside of DR for more value?
 actions.aoe+=/deep_breath,if=!buff.dragonrage.up
 # Send SS when it doesn't overflow EB, without vigor send on CD
@@ -64,13 +67,12 @@ actions.aoe+=/pyre,if=talent.volatility&active_enemies>=3
 # Cast LF with burnout proc and leaping flames up as long as you have 0 EB
 actions.aoe+=/living_flame,if=buff.burnout.up&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Pyre logic without volatility.
-# Without Vola use pyre if raging debuff is active, or if on 3T with 3 stacks of CB, or if 4T+
+# Without Vola use pyre if raging debuff is active, or if on 3T with 15 stacks of CB, or if 4T+
 actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
 # Use staff on 5T or below
 actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
 # Yoinked the disintegrate logic from ST
-# Early Chain in DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement
-actions.st+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=(buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|(buff.burnout.up&(buff.essence_burst.stack<buff.essence_burst.max_stack&buff.leaping_flames.down|buff.leaping_flames.up&buff.essence_burst.down)&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up))&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+actions.aoe+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=(buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|(buff.burnout.up&buff.essence_burst.stack<buff.essence_burst.max_stack&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up))&(raid_event.movement.in>2|buff.hover.up),if=(buff.dragonrage.up|(!talent.shattering_star|cooldown.shattering_star.remains>6|essence.deficit<=1|buff.essence_burst.stack==buff.essence_burst.max_stack))&(raid_event.movement.in>2|buff.hover.up)
 # Cast LF with burnout and snapfire(kekW) proc for those juicy insta firestorms
 actions.aoe+=/living_flame,if=talent.snapfire&buff.burnout.up
 # Fallback filler
@@ -90,21 +92,26 @@ actions.fb+=/fire_breath,empower_to=4
 
 # ST Action List, it's a mess, but it's getting better!
 actions.st=use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&raid_event.movement.in>6
+# Variable for when to start holding empowers.
+actions.st+=/variable,name=dr_prep_time_st,value=13
 # Movement Logic, Time spiral logic might need some tweaking
 #actions.st+=/time_spiral,if=raid_event.movement.in<3&cooldown.hover.remains>=3&!buff.hover.up
 actions.st+=/hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
 # Spend firestorm procs ASAP
 actions.st+=/firestorm,if=buff.snapfire.up
-# Variable for when to start holding empowers.
-actions.st+=/variable,name=dr_prep_time_st,value=13
 # Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
+# DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
-actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
+# Cast Fire Breath
+# DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
+actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
 # Throw Star on CD, Don't overcap with Arcane Vigor.
 actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
 # Tip Eternity Surge in DR For more DPS by shortening the cast
 actions.st+=/tip_the_scales,if=buff.dragonrage.up&cooldown.eternity_surge.up&!cooldown.fire_breath.up
-actions.st+=/call_action_list,name=es,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)
+# Cast Eternity Surge
+# DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
+actions.st+=/call_action_list,name=es,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
 # Wait for FB/ES to be ready if spending another GCD would result in the cast no longer fitting inside of DR
 actions.st+=/wait,sec=cooldown.fire_breath.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time*buff.tip_the_scales.down&buff.dragonrage.remains-cooldown.fire_breath.remains>=variable.r1_cast_time*buff.tip_the_scales.down
 actions.st+=/wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time&buff.dragonrage.remains-cooldown.eternity_surge.remains>variable.r1_cast_time*buff.tip_the_scales.down
