@@ -72,7 +72,7 @@ actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_ene
 # Use staff on 5T or below
 actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
 # Yoinked the disintegrate logic from ST
-actions.aoe+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&(buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|(buff.burnout.up&(buff.essence_burst.stack<buff.essence_burst.max_stack&buff.leaping_flames.down|buff.leaping_flames.up&buff.essence_burst.down)&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up|cooldown.azure_strike.up))&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+actions.aoe+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
 # Cast LF with burnout and snapfire(kekW) proc for those juicy insta firestorms
 actions.aoe+=/living_flame,if=talent.snapfire&buff.burnout.up
 # Fallback filler
@@ -123,7 +123,7 @@ actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essen
 # Spend pyre if raging inferno debuff is active and you have 20 stacks of CB on 2T
 actions.st+=/pyre,if=debuff.in_firestorm.up&talent.raging_inferno&buff.charged_blast.stack==20&active_enemies>=2
 # Early Chain in DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement
-actions.st+=/disintegrate,chain=1,early_chain_if=(evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&(buff.dragonrage.up&ticks>=2&(cooldown.shattering_star.up|(buff.burnout.up&(buff.essence_burst.stack<buff.essence_burst.max_stack&buff.leaping_flames.down|buff.leaping_flames.up&buff.essence_burst.down)&essence<essence.max-1)|cooldown.fire_breath.up|cooldown.eternity_surge.up|cooldown.azure_strike.up))&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
 # Hard cast only outside of SS and DR windows
 actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
 # Use Deep Breath on 2T, unless adds will come before it'll be ready again or if talented ID.
