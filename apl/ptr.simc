@@ -102,13 +102,13 @@ actions.st+=/firestorm,if=buff.snapfire.up
 # Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
 # DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
+# Tip Eternity Surge without EBF - Tip Fire Breath with EBF
+actions.st+=/tip_the_scales,if=buff.dragonrage.up&(cooldown.eternity_surge.up&!cooldown.fire_breath.up&!talent.everburning_flame)|(talent.everburning_flame&cooldown.fire_breath.up)
 # Cast Fire Breath
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
 actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
 # Throw Star on CD, Don't overcap with Arcane Vigor.
 actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
-# Tip Eternity Surge in DR For more DPS by shortening the cast
-actions.st+=/tip_the_scales,if=buff.dragonrage.up&cooldown.eternity_surge.up&!cooldown.fire_breath.up
 # Cast Eternity Surge
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
 actions.st+=/call_action_list,name=es,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
