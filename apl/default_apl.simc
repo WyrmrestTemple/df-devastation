@@ -129,7 +129,8 @@ actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
 # Use Deep Breath on 2T, unless adds will come before it'll be ready again or if talented ID.
 actions.st+=/deep_breath,if=!buff.dragonrage.up&active_enemies>=2&((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
 actions.st+=/deep_breath,if=!buff.dragonrage.up&talent.imminent_destruction&!debuff.shattering_star_debuff.up
-actions.st+=/living_flame,if=!buff.dragonrage.up|buff.iridescence_red.remains>execute_time
+# Cast LF outside of DR, or with red buff/scarlet adaption up
+actions.st+=/living_flame,if=!buff.dragonrage.up|(buff.iridescence_red.remains>execute_time|buff.scarlet_adaptation.remains>execute_time)&active_enemies==1
 # Fallback for movement
 actions.st+=/azure_strike
 
