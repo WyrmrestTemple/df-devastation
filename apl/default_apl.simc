@@ -62,8 +62,8 @@ actions.aoe+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max
 # Cast Firestorm before spending ressources
 actions.aoe+=/firestorm
 # Pyre logic with volatility.
-# Pyre on 3T+
-actions.aoe+=/pyre,if=talent.volatility&active_enemies>=3
+# Pyre on 3T+ unless not playing burnout and blue buff+EB is up
+actions.aoe+=/pyre,if=talent.volatility&active_enemies>=3&(talent.burnout|(!buff.iridescence_blue.up&!buff.essence_burst.up&active_enemies==3))
 # Pyre logic without volatility.
 # Without Vola use pyre if raging debuff is active, or if on 3T with 15 stacks of CB, or if 4T+
 actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
