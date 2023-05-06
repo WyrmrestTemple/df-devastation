@@ -42,10 +42,12 @@ actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.p
 # Rupt to make the raidleader happy
 actions+=/quell,use_off_gcd=1,if=target.debuff.casting.react
 actions+=/call_action_list,name=trinkets
-actions+=/run_action_list,name=st_opener,if=time<9&cooldown.eternity_surge.up&active_enemies<=2
+# Go into ST opener on 1-2T if you don't have PI or T30
+actions+=/run_action_list,name=st_opener,if=time<9&cooldown.eternity_surge.up&active_enemies<=2&(cooldown.invoke_power_infusion_0.up|!set_bonus.tier30_4pc)
 actions+=/run_action_list,name=aoe,if=active_enemies>=3
 actions+=/run_action_list,name=st
 
+# Opener rotaion
 actions.st_opener=dragonrage
 actions.st_opener+=/call_action_list,name=fb
 actions.st_opener+=/tip_the_scales
@@ -119,14 +121,18 @@ actions.st+=/firestorm,if=buff.snapfire.up
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
 # Tip Eternity Surge without EBF - Tip Fire Breath with EBF
 actions.st+=/tip_the_scales,if=buff.dragonrage.up&(cooldown.eternity_surge.up&!cooldown.fire_breath.up&!talent.everburning_flame)|(talent.everburning_flame&cooldown.fire_breath.up)
-# Cast Fire Breath
+# Cast Fire Breath todo: update comments cba rn
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
-actions.st+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
+actions.st+=/call_action_list,name=fb,if=set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(target.time_to_die>=8|fight_remains<30)
+# FB logic for T29, keeping for legacy support
+actions.st+=/call_action_list,name=fb,if=!set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
 # Throw Star on CD, Don't overcap with Arcane Vigor.
 actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
-# Cast Eternity Surge
+# Cast Eternity Surge todo: update comments cba rn
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
-actions.st+=/call_action_list,name=es,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
+actions.st+=/call_action_list,name=es,if=set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(target.time_to_die>=8|fight_remains<30)
+# ES logic for T29, keeping for legacy support
+actions.st+=/call_action_list,name=es,if=!set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
 # Wait for FB/ES to be ready if spending another GCD would result in the cast no longer fitting inside of DR
 actions.st+=/wait,sec=cooldown.fire_breath.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time*buff.tip_the_scales.down&buff.dragonrage.remains-cooldown.fire_breath.remains>=variable.r1_cast_time*buff.tip_the_scales.down
 actions.st+=/wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.dragonrage.up&buff.dragonrage.remains<gcd.max+variable.r1_cast_time&buff.dragonrage.remains-cooldown.eternity_surge.remains>variable.r1_cast_time*buff.tip_the_scales.down
@@ -137,8 +143,10 @@ actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.es
 actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence<essence.max-1
 # Spend pyre if raging inferno debuff is active and you have 20 stacks of CB on 2T
 actions.st+=/pyre,if=debuff.in_firestorm.up&talent.raging_inferno&buff.charged_blast.stack==20&active_enemies>=2
-# Early Chain in DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement
-actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
+# Early Chain in DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement todo: update comments cba rn
+actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&!(buff.power_infusion.up&buff.bloodlust.up)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
+# Dis logic for T29, keeping for legacy support
+actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=!set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
 # Hard cast only outside of SS and DR windows
 actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
 # Use Deep Breath on 2T, unless adds will come before it'll be ready again or if talented ID.
