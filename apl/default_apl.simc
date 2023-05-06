@@ -17,7 +17,7 @@ actions.precombat+=/variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5
 actions.precombat+=/variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.2.cooldown.duration=0)
 # Estimates a trinkets value by comparing the cooldown of the trinket, divided by the duration of the buff it provides. Has a intellect modifier (currently 1.5x) to give a higher priority to intellect trinkets. The intellect modifier should be changed as intellect priority increases or decreases. As well as a modifier for if a trinket will or will not sync with cooldowns.
 actions.precombat+=/variable,name=trinket_1_manual,value=trinket.1.is.spoils_of_neltharus
-actions.precombat+=/variable,name=trinket_2_manual,value=trinket.1.is.spoils_of_neltharus
+actions.precombat+=/variable,name=trinket_2_manual,value=trinket.2.is.spoils_of_neltharus
 actions.precombat+=/variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
 actions.precombat+=/variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
 actions.precombat+=/variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
@@ -33,7 +33,8 @@ actions.precombat+=/firestorm,if=talent.firestorm
 actions.precombat+=/living_flame,if=!talent.firestorm
 
 # Executed every time the actor is available.
-actions=potion,if=buff.dragonrage.up|fight_remains<35
+# Delay pot in ST if you are about to SS - mostly relevant for opener where you want DR->FB->SS->rotation
+actions=potion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|active_enemies>=2)|fight_remains<35
 # Variable that evaluates when next dragonrage is by working out the maximum between the dragonrage cd and your empowers, ignoring CDR effect estimates.
 actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
 # Invoke External Power Infusions if they're available during dragonrage
@@ -51,7 +52,7 @@ actions.st_opener+=/tip_the_scales
 actions.st_opener+=/shattering_star
 actions.st_opener+=/living_flame,if=essence<3&!buff.essence_burst.up&buff.power_infusion.up
 actions.st_opener+=/call_action_list,name=es,if=!buff.power_swell.up
-actions.st_opener+=/disintegrate,chain=1,early_chain_if=buff.dragonrage.up&ticks>=2,interrupt_if=(buff.power_swell.remains<gcd.max|(essence<3&!buff.essence_burst.up))&ticks>=2
+actions.st_opener+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2,interrupt_if=evoker.use_clipping&(buff.power_swell.remains<gcd.max|(essence<3&!buff.essence_burst.up))&ticks>=2
 
 # AOE action list; Actually kinda clean now
 # Open with star before DR to save a global and start with a free EB
