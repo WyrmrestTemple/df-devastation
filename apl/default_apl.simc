@@ -30,6 +30,7 @@ actions.precombat+=/variable,name=dr_prep_time_st,default=13,op=reset
 actions.precombat+=/variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
 actions.precombat+=/verdant_embrace,if=talent.scarlet_adaptation|talent.ancient_flame
 actions.precombat+=/use_item,name=shadowed_orb_of_torment
+# Pay your pala for a BoP before you do this one
 actions.precombat+=/deep_breath,if=(raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy)
 actions.precombat+=/firestorm,if=talent.firestorm&!((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
 actions.precombat+=/living_flame,if=!talent.firestorm&!((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
@@ -88,7 +89,7 @@ actions.aoe+=/pyre,if=talent.volatility&(active_enemies>=4|(talent.charged_blast
 # Pyre logic without volatility.
 # Without Vola use pyre if raging debuff is active, or if on 3T with 15 stacks of CB, or if 4T+
 actions.aoe+=/pyre,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
-# Cast LF with leaping flames if: not playing burnout, burnout is up, more than 4 enemies, or scarlet adaptation is up.
+# Cast LF with leaping flames up if: not playing burnout, burnout is up, more than 4 enemies, or scarlet adaptation is up.
 actions.aoe+=/living_flame,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Use staff on 5T or below
 actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
@@ -123,14 +124,16 @@ actions.st+=/firestorm,if=buff.snapfire.up
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
 # Tip Eternity Surge without EBF - Tip Fire Breath with EBF
 actions.st+=/tip_the_scales,if=buff.dragonrage.up&(cooldown.eternity_surge.up&!cooldown.fire_breath.up&!talent.everburning_flame)|(talent.everburning_flame&cooldown.fire_breath.up)
-# Cast Fire Breath todo: update comments cba rn
+# Fire breath logic
+# Play around power swell if you don't have pi or lust up. Play around blazing shards if outside of DR.
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
 actions.st+=/call_action_list,name=fb,if=set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(target.time_to_die>=8|fight_remains<30)
 # FB logic for T29, keeping for legacy support
 actions.st+=/call_action_list,name=fb,if=!set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.limitless_potential.remains<variable.r1_cast_time|!buff.power_infusion.up)&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
 # Throw Star on CD, Don't overcap with Arcane Vigor.
 actions.st+=/shattering_star,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
-# Cast Eternity Surge todo: update comments cba rn
+# Eternity Surge logic
+# Play around power swell if you don't have pi or lust up. Play around blazing shards if outside of DR.
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
 actions.st+=/call_action_list,name=es,if=set_bonus.tier30_4pc&(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_st|!talent.animosity)&((buff.power_swell.remains<variable.r1_cast_time|buff.bloodlust.up|buff.power_infusion.up)&(buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up))&(target.time_to_die>=8|fight_remains<30)
 # ES logic for T29, keeping for legacy support
@@ -145,19 +148,25 @@ actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.es
 actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence.deficit>=2
 # Spend pyre if raging inferno debuff is active and you have 20 stacks of CB on 2T
 actions.st+=/pyre,if=debuff.in_firestorm.up&talent.raging_inferno&buff.charged_blast.stack==20&active_enemies>=2
-# Early Chain in DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement todo: update comments cba rn
-actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&!(buff.power_infusion.up&buff.bloodlust.up)&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),if=set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
-# Dis logic for T29, keeping for legacy support
+# Dis logic
+# Early Chain in DR after third tick if both lust & pi isn't up.
+# Clip after in DR after third tick for more important buttions, atm that is: empowers, burnout & SS. burnout and SS you only clip for if both lust & pi isn't up.
+actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&buff.dragonrage.up&!(buff.power_infusion.up&buff.bloodlust.up)&(raid_event.movement.in>2|buff.hover.up),
+interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(!(buff.power_infusion.up&buff.bloodlust.up)|cooldown.fire_breath.up|cooldown.eternity_surge.up)&(raid_event.movement.in>2|buff.hover.up),
+if=set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
+# Dis logic for T29, keeping for legacy support - Early Chain in DR 3rd tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement
 actions.st+=/disintegrate,chain=1,early_chain_if=evoker.use_early_chaining&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=!set_bonus.tier30_4pc&raid_event.movement.in>2|buff.hover.up
 # Hard cast only outside of SS and DR windows
 actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
 # Use Deep Breath on 2T, unless adds will come before it'll be ready again or if talented ID.
 actions.st+=/deep_breath,if=!buff.dragonrage.up&active_enemies>=2&((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
 actions.st+=/deep_breath,if=!buff.dragonrage.up&talent.imminent_destruction&!debuff.shattering_star_debuff.up
+# Verdant embrace poggers todo: scarlet mathies once implemented
+actions.st+=/verdant_embrace,if=talent.ancient_flame&talent.scarlet_adaptation&!buff.dragonrage.up&!buff.ancient_flame.up
+#actions.st+=/emerald_blossom,if=talent.ancient_flame&talent.scarlet_adaptation&!buff.dragonrage.up&!buff.ancient_flame.up
 # Cast LF outside of DR, or with red buff/scarlet adaption up
 actions.st+=/living_flame,if=!buff.dragonrage.up|(buff.iridescence_red.remains>execute_time|buff.scarlet_adaptation.up|buff.iridescence_blue.up)&active_enemies==1
 # Fallback for movement
-actions.st+=/verdant_embrace,if=talent.ancient_flame&!buff.dragonrage.up
 actions.st+=/azure_strike
 
 # With spoils try to fish for non vers buff before you using it on <=2T, use regardless of buff when 18s is left on DR. Don't fish when >=3T.
