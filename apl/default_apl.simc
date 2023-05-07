@@ -140,7 +140,7 @@ actions.st+=/wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.d
 actions.st+=/living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
 actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
 # Spend burnout procs without overcapping resources
-actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence<essence.max-1
+actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence.deficit>=2
 # Spend pyre if raging inferno debuff is active and you have 20 stacks of CB on 2T
 actions.st+=/pyre,if=debuff.in_firestorm.up&talent.raging_inferno&buff.charged_blast.stack==20&active_enemies>=2
 # Early Chain in DR or if overflowing chain after the 3rd damage tick. Clip after third tick in dragonrage for more important buttons. Will only cast if >2s till movement todo: update comments cba rn
