@@ -109,8 +109,8 @@ actions.st+=/firestorm,if=buff.snapfire.up
 # Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
 # DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
 actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
-# Tip 2nd FB in DR.
-actions.st+=/tip_the_scales,if=buff.dragonrage.up&cooldown.fire_breath.up&!cooldown.eternity_surge.up
+# Tip second FB if not playing font of magic or if playing EBF, otherwise tip ES.
+actions.st+=/tip_the_scales,if=buff.dragonrage.up&(((!talent.font_of_magic|talent.everburning_flame)&cooldown.fire_breath.up&!cooldown.eternity_surge.up)|(cooldown.eternity_surge.up&!cooldown.fire_breath.up&!talent.everburning_flame&talent.font_of_magic))
 # Fire breath logic
 # Play around power swell if you don't have pi or lust up. Play around blazing shards if outside of DR.
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
