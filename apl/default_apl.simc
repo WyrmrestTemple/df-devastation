@@ -39,7 +39,7 @@ actions=potion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|active_enemie
 # Variable that evaluates when next dragonrage is by working out the maximum between the dragonrage cd and your empowers, ignoring CDR effect estimates.
 actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
 # Invoke External Power Infusions if they're available during dragonrage
-actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up
+actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up&!cooldown.fire_breath.up&!cooldown.shattering_star.up
 # Rupt to make the raidleader happy
 actions+=/quell,use_off_gcd=1,if=target.debuff.casting.react
 actions+=/call_action_list,name=trinkets
