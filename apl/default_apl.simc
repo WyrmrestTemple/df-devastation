@@ -49,8 +49,7 @@ actions+=/run_action_list,name=aoe,if=active_enemies>=3
 actions+=/run_action_list,name=st
 
 # Opener rotation
-actions.st_opener=verdant_embrace,if=!buff.ancient_flame.up&talent.ancient_flame
-actions.st_opener+=/dragonrage
+actions.st_opener=dragonrage
 actions.st_opener+=/call_action_list,name=fb
 actions.st_opener+=/tip_the_scales
 actions.st_opener+=/shattering_star
