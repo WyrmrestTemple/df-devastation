@@ -139,7 +139,7 @@ actions.st+=/wait,sec=cooldown.eternity_surge.remains,if=talent.animosity&buff.d
 actions.st+=/living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
 actions.st+=/azure_strike,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max
 # Get Ancient Flame for Burnout Procs
-actions.st+=/call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&buff.burnout.up
+actions.st+=/call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&buff.burnout.up&debuff.shattering_star_debuff.down
 # Spend burnout procs without overcapping resources
 actions.st+=/living_flame,if=buff.burnout.up&(buff.leaping_flames.up&!buff.essence_burst.up|!buff.leaping_flames.up&buff.essence_burst.stack<buff.essence_burst.max_stack)&essence.deficit>=2
 # Spend pyre if raging inferno debuff is active and you have 20 stacks of CB on 2T
@@ -156,7 +156,7 @@ actions.st+=/firestorm,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down
 actions.st+=/deep_breath,if=!buff.dragonrage.up&active_enemies>=2&((raid_event.adds.in>=120&!talent.onyx_legacy)|(raid_event.adds.in>=60&talent.onyx_legacy))
 actions.st+=/deep_breath,if=!buff.dragonrage.up&talent.imminent_destruction&!debuff.shattering_star_debuff.up
 # Get Ancient Flame as Filler
-actions.st+=/call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up
+actions.st+=/call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&debuff.shattering_star_debuff.down
 # Cast LF outside of DR without ancient flame, or having Verdant Embrace up, or having Emerald blossom, or Irid Red. In DR only cast without Ancient Flame.
 actions.st+=/living_flame,if=!buff.dragonrage.up&(!buff.ancient_flame.up|cooldown.verdant_embrace.up|cooldown.emerald_blossom.up|buff.iridescence_red.remains>execute_time)|(buff.iridescence_red.remains>execute_time|buff.iridescence_blue.up)&active_enemies==1&!buff.ancient_flame.up
 # Fallback for movement
