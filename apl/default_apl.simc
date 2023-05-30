@@ -48,8 +48,10 @@ actions+=/run_action_list,name=aoe,if=active_enemies>=3
 actions+=/run_action_list,name=st
 
 # AOE action list; Actually kinda clean now
+# Get Ancient Flame for dragonrage
+actions.aoe=call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&talent.dragonrage&cooldown.dragonrage.ready&(target.time_to_die>=32|fight_remains<30)
 # Open with star before DR to save a global and start with a free EB
-actions.aoe=shattering_star,target_if=max:target.health.pct,if=cooldown.dragonrage.up
+actions.aoe+=/shattering_star,target_if=max:target.health.pct,if=cooldown.dragonrage.up
 # Send DR on CD with no regard to the safety of the mobs - DPS loss to hold DR for empowers, in real world scenario maybe you hold if you are going for longer DRs
 # DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
 actions.aoe+=/dragonrage,if=target.time_to_die>=32|fight_remains<30
@@ -77,8 +79,10 @@ actions.aoe+=/pyre,target_if=max:target.health.pct,if=talent.volatility&(active_
 # Pyre logic without volatility.
 # Without Vola use pyre if raging debuff is active, or if on 3T with 15 stacks of CB, or if 4T+
 actions.aoe+=/pyre,target_if=max:target.health.pct,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
-# Cast LF with leaping flames up if: not playing burnout, burnout is up, more than 4 enemies, or scarlet adaptation is up.
-actions.aoe+=/living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
+# Get Ancient Flame for Burnout Procs
+actions.aoe+=/call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&buff.burnout.up&debuff.shattering_star_debuff.down
+# Cast LF with burnout/leaping flames up, as long as you don't overflow ressources (relevant for 3T)
+actions.aoe+=/living_flame,target_if=max:target.health.pct,if=(buff.leaping_flames.up|buff.burnout.up)&!buff.essence_burst.up&essence<essence.max-1
 # Use staff on 5T or below
 actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
 # Yoinked the disintegrate logic from ST
