@@ -37,7 +37,7 @@ actions.precombat+=/living_flame,if=!talent.firestorm
 # Delay pot in ST if you are about to SS - mostly relevant for opener where you want DR->FB->SS->rotation
 actions=potion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|active_enemies>=2)|fight_remains<35
 # Variable that evaluates when next dragonrage is by working out the maximum between the dragonrage cd and your empowers, ignoring CDR effect estimates.
-actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
+actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-10)<?(cooldown.fire_breath.remains-gcd.max)<?(fight_remains<130&fight_remains>50&buff.bloodlust.down)*(fight_remains-50)
 # Invoke External Power Infusions if they're available during dragonrage
 actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up&!cooldown.fire_breath.up&!cooldown.shattering_star.up
 # Rupt to make the raidleader happy
@@ -112,7 +112,7 @@ actions.st+=/hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
 actions.st+=/firestorm,if=buff.snapfire.up
 # Relaxed Dragonrage Entry Requirements, cannot reliably reach third extend under normal conditions (Bloodlust + Power Infusion/Very high haste gear)
 # DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
-actions.st+=/dragonrage,if=cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
+actions.st+=/dragonrage,if=variable.next_dragonrage==0&target.time_to_die>=32|fight_remains<30
 # Tip second FB if not playing font of magic or if playing EBF, otherwise tip ES.
 actions.st+=/tip_the_scales,if=buff.dragonrage.up&(((!talent.font_of_magic|talent.everburning_flame)&cooldown.fire_breath.remains<cooldown.eternity_surge.remains&buff.dragonrage.remains<14)|(cooldown.eternity_surge.remains<cooldown.fire_breath.remains&!talent.everburning_flame&talent.font_of_magic))
 # Fire breath logic
