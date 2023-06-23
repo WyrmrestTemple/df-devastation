@@ -31,6 +31,8 @@ actions.precombat+=/variable,name=delay_dr,default=0,op=reset
 actions.precombat+=/variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
 actions.precombat+=/verdant_embrace,if=talent.scarlet_adaptation&talent.firestorm
 actions.precombat+=/use_item,name=shadowed_orb_of_torment
+# please dont do this, this is just a hack to make delaying DR work properly when we lust on pull
+actions.precombat+=/deep_breath,if=variable.delay_dr
 actions.precombat+=/firestorm,if=talent.firestorm
 actions.precombat+=/living_flame,if=!talent.firestorm
 
@@ -38,7 +40,7 @@ actions.precombat+=/living_flame,if=!talent.firestorm
 # Delay pot in ST if you are about to SS - mostly relevant for opener where you want DR->FB->SS->rotation
 actions=potion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|active_enemies>=2)|fight_remains<35
 # Variable that evaluates when the next DR should / will be used
-actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-10)<?(cooldown.fire_breath.remains-gcd.max)<?(fight_remains<130&fight_remains>50&buff.bloodlust.down)*(fight_remains-50)*variable.delay_dr
+actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-10)<?(cooldown.fire_breath.remains-gcd.max)<?((fight_remains-10)%%120-50)*buff.bloodlust.down*variable.delay_dr
 # Invoke External Power Infusions if they're available during dragonrage
 actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up&!cooldown.fire_breath.up&!cooldown.shattering_star.up
 # Rupt to make the raidleader happy
