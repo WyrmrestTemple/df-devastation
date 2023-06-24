@@ -66,16 +66,16 @@ actions.aoe+=/deep_breath,if=!buff.dragonrage.up
 actions.aoe+=/shattering_star,target_if=max:target.health.pct,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
 # Cast Firestorm before spending ressources
 actions.aoe+=/firestorm
-# Pyre logic with volatility.
-# Pyre 4T+
+# Pyre logic
+# Pyre 5T+
+# Pyre 4T with vola or if not playing CB
 # Pyre on 3T if playing CB and neither EB or blue buff is up
 # Pyre on 3T if not playing CB aslong as both EB and blue buff isn't up at the same time.
 # Pyre with 15 stacks of CB
-# Pyre with raging debuff active
-actions.aoe+=/pyre,target_if=max:target.health.pct,if=talent.volatility&(active_enemies>=4|(talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up)|(!talent.charged_blast&(!buff.essence_burst.up|!buff.iridescence_blue.up))|(buff.charged_blast.stack>=15)|(talent.raging_inferno&debuff.in_firestorm.up))
-# Pyre logic without volatility.
-# Without Vola use pyre if raging debuff is active, or if on 3T with 15 stacks of CB, or if 4T+
-actions.aoe+=/pyre,target_if=max:target.health.pct,if=(talent.raging_inferno&debuff.in_firestorm.up)|(active_enemies==3&buff.charged_blast.stack>=15)|active_enemies>=4
+actions.aoe+=/pyre,target_if=max:target.health.pct,if=active_enemies>=5
+actions.aoe+=/pyre,target_if=max:target.health.pct,if=active_enemies>=4&(!talent.charged_blast|talent.volatility)
+actions.aoe+=/pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.volatility&(talent.charged_blast&!buff.essence_burst.up&!buff.iridescence_blue.up|(!talent.charged_blast&(!buff.essence_burst.up|!buff.iridescence_blue.up)))
+actions.aoe+=/pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=15
 # Cast LF with leaping flames up if: not playing burnout, burnout is up, more than 4 enemies, or scarlet adaptation is up.
 actions.aoe+=/living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Use staff on 5T or below
