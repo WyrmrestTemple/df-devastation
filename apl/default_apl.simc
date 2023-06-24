@@ -78,8 +78,6 @@ actions.aoe+=/pyre,target_if=max:target.health.pct,if=active_enemies>=3&talent.v
 actions.aoe+=/pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=15
 # Cast LF with leaping flames up if: not playing burnout, burnout is up, more than 4 enemies, or scarlet adaptation is up.
 actions.aoe+=/living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
-# Use staff on 5T or below
-actions.aoe+=/use_item,name=kharnalex_the_first_light,if=!buff.dragonrage.up&debuff.shattering_star_debuff.down&active_enemies<=5
 # Yoinked the disintegrate logic from ST
 actions.aoe+=/disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
 # Cast LF with burnout and snapfire(kekW) proc for those juicy insta firestorms
