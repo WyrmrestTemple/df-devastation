@@ -60,7 +60,7 @@ actions.aoe+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_drag
 # Cast Eternity Surge - stagger for swell/blazing shards outside DR
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
 actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
-# Cast DB if not in DR and not running imminent destruction. - I'm assuming that casting DB inside of DR with imminent before you start spending should be an increase, but might be worth to save it for outside of DR for more value?
+# Cast DB if not in DR
 actions.aoe+=/deep_breath,if=!buff.dragonrage.up
 # Send SS when it doesn't overflow EB, without vigor send on CD
 actions.aoe+=/shattering_star,target_if=max:target.health.pct,if=buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor
@@ -80,7 +80,7 @@ actions.aoe+=/pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=
 actions.aoe+=/living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|active_enemies>=4|buff.scarlet_adaptation.up)&buff.leaping_flames.up&!buff.essence_burst.up&essence<essence.max-1
 # Yoinked the disintegrate logic from ST
 actions.aoe+=/disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&(buff.dragonrage.up|essence.deficit<=1)&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=raid_event.movement.in>2|buff.hover.up
-# Cast LF with burnout and snapfire(kekW) proc for those juicy insta firestorms
+# Cast LF with burnout and snapfire proc for those juicy insta firestorms
 actions.aoe+=/living_flame,target_if=max:target.health.pct,if=talent.snapfire&buff.burnout.up
 # Fallback filler
 actions.aoe+=/azure_strike,target_if=max:target.health.pct
