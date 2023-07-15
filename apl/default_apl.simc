@@ -26,21 +26,22 @@ actions.precombat+=/variable,name=r1_cast_time,value=1.0*spell_haste
 # Variable for when to start holding empowers for upcoming DR in AoE. - From my testing 4sec seems like the sweetspot, but it's very minor diff so far - Holding for more than 6 seconds it begins to become a loss.
 actions.precombat+=/variable,name=dr_prep_time_aoe,default=4,op=reset
 # Variable for when to start holding empowers for upcoming DR in ST.
-actions.precombat+=/variable,name=dr_prep_time_st,default=13,op=reset
+actions.precombat+=/variable,name=dr_prep_time_st,default=5,op=reset
 actions.precombat+=/variable,name=delay_dr,default=0,op=reset
 actions.precombat+=/variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
 actions.precombat+=/verdant_embrace,if=talent.scarlet_adaptation&talent.firestorm
 actions.precombat+=/use_item,name=shadowed_orb_of_torment
-# please dont do this, this is just a hack to make delaying DR work properly when we lust on pull
-actions.precombat+=/deep_breath,if=variable.delay_dr
-actions.precombat+=/firestorm,if=talent.firestorm
+actions.precombat+=/firestorm,if=talent.firestorm&!variable.delay_dr
+# Note: delay_dr depends on this because we might not have lust on the first action, which will make the apl do weird things
+# using deep breath on pull can be risky and is a very minor dps increase (~100 DPS over 5 minutes in ST)
+actions.precombat+=/deep_breath,if=(raid_event.adds.in>=120-60*talent.onyx_legacy)|variable.delay_dr
 actions.precombat+=/living_flame,if=!talent.firestorm
 
 # Executed every time the actor is available.
 # Delay pot in ST if you are about to SS - mostly relevant for opener where you want DR->FB->SS->rotation
 actions=potion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|active_enemies>=2)|fight_remains<35
-# Variable that evaluates when the next DR should / will be used
-actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-10)<?(cooldown.fire_breath.remains-gcd.max)<?((fight_remains-10)%%120-50)*buff.bloodlust.down*variable.delay_dr
+# Variable that evaluates when the next DR can be used
+actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?((fight_remains-10)%%120-50)*buff.bloodlust.down*variable.delay_dr
 # Invoke External Power Infusions if they're available during dragonrage
 actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&!buff.power_infusion.up&!cooldown.fire_breath.up&!cooldown.shattering_star.up
 # Rupt to make the raidleader happy
@@ -54,15 +55,15 @@ actions+=/run_action_list,name=st
 actions.aoe=shattering_star,target_if=max:target.health.pct,if=cooldown.dragonrage.up
 # Send DR on CD with no regard to the safety of the mobs - DPS loss to hold DR for empowers, in real world scenario maybe you hold if you are going for longer DRs
 # DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
-actions.aoe+=/dragonrage,if=target.time_to_die>=32|fight_remains<30
+actions.aoe+=/dragonrage,if=variable.next_dragonrage==0&target.time_to_die>=32|fight_remains<30
 # Use tip to get that sweet aggro
 actions.aoe+=/tip_the_scales,if=buff.dragonrage.up&(active_enemies<=3+3*talent.eternitys_span|!cooldown.fire_breath.up)
 # Cast Fire Breath - stagger for swell/blazing shards outside DR
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
-actions.aoe+=/call_action_list,name=fb,if=(!talent.dragonrage|variable.next_dragonrage>variable.dr_prep_time_aoe|!talent.animosity)&(buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time|buff.dragonrage.up)&(target.time_to_die>=8|fight_remains<30)
+actions.aoe+=/call_action_list,name=fb,if=buff.dragonrage.up|(!talent.dragonrage|!talent.animosity|(variable.next_dragonrage<?cooldown.eternity_surge.remains)>variable.dr_prep_time_aoe)&(buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
 # Cast Eternity Surge - stagger for swell/blazing shards outside DR
 # DS optimization: Only cast if current fight will last 8s+ or encounter ends in less than 30s
-actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|!talent.dragonrage|(cooldown.dragonrage.remains>variable.dr_prep_time_aoe&buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
+actions.aoe+=/call_action_list,name=es,if=buff.dragonrage.up|(!talent.dragonrage|!talent.animosity|(variable.next_dragonrage<?cooldown.fire_breath.remains)>variable.dr_prep_time_aoe)&(buff.power_swell.remains<variable.r1_cast_time&buff.blazing_shards.remains<variable.r1_cast_time)&(target.time_to_die>=8|fight_remains<30)
 # Cast DB if not in DR and not running imminent destruction. - I'm assuming that casting DB inside of DR with imminent before you start spending should be an increase, but might be worth to save it for outside of DR for more value?
 actions.aoe+=/deep_breath,if=!buff.dragonrage.up
 # Send SS when it doesn't overflow EB, without vigor send on CD
@@ -113,7 +114,7 @@ actions.st+=/hover,use_off_gcd=1,if=raid_event.movement.in<2&!buff.hover.up
 # Spend firestorm procs ASAP
 actions.st+=/firestorm,if=buff.snapfire.up
 # DS optimization: Only cast if current fight will last 32s+ or encounter ends in less than 30s
-actions.st+=/dragonrage,if=variable.next_dragonrage==0&target.time_to_die>=32|fight_remains<30
+actions.st+=/dragonrage,if=variable.next_dragonrage==0&cooldown.fire_breath.remains<4&cooldown.eternity_surge.remains<10&target.time_to_die>=32|fight_remains<30
 # Tip second FB if not playing font of magic or if playing EBF, otherwise tip ES.
 actions.st+=/tip_the_scales,if=buff.dragonrage.up&(((!talent.font_of_magic|talent.everburning_flame)&cooldown.fire_breath.remains<cooldown.eternity_surge.remains&buff.dragonrage.remains<14)|(cooldown.eternity_surge.remains<cooldown.fire_breath.remains&!talent.everburning_flame&talent.font_of_magic))
 # Fire breath logic
