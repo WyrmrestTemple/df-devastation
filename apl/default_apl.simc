@@ -38,7 +38,7 @@ actions=potion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|active_enemie
 # Variable that evaluates when next dragonrage is by working out the maximum between the dragonrage cd and your empowers, ignoring CDR effect estimates.
 actions+=/variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?(cooldown.eternity_surge.remains-2*gcd.max)<?(cooldown.fire_breath.remains-gcd.max)
 # Invoke External Power Infusions if they're available during dragonrage
-actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=3&&set_bonus.tier31_2pc)||(!cooldown.fire_breath.up&!cooldown.shattering_star.up&&!set_bonus.tier31_2pc))
+actions+=/invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=3&&set_bonus.tier31_2pc)|(!cooldown.fire_breath.up&!cooldown.shattering_star.up&&!set_bonus.tier31_2pc))
 # Rupt to make the raidleader happy
 actions+=/quell,use_off_gcd=1,if=target.debuff.casting.react
 actions+=/call_action_list,name=trinkets
@@ -140,6 +140,7 @@ actions.st+=/azure_strike
 
 # Use spoils along with Dragon Rage when both FB & SS is on CD on <=2T or immediately on >=3T
 actions.trinkets=use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(!cooldown.fire_breath.up&!cooldown.shattering_star.up|active_enemies>=3)|fight_remains<=20
+actions.trinkets+=/use_item,name=dreambinder_loom_of_the_great_cycle
 # Use Belor'relos, the Suncaller before we go into our cooldowns
 # Fit in a Burnout/Green spell/Azure strike as you cast Nymue's for the "free" GCD or Belor on AOE
 actions.trinkets+=/use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|cooldown.dragonrage.remains>=20&!buff.dragonrage.up|variable.trinket_2_buffs&trinket.2.cooldown.remains>=20|variable.trinket_1_buffs&trinket.1.cooldown.remains>=20|(!variable.trinket_1_buffs|trinket.1.cooldown.duration=0)&(!variable.trinket_2_buffs|trinket.2.cooldown.duration=0))&gcd.remains>0.3|fight_remains<=20
