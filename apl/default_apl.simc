@@ -10,14 +10,16 @@ actions.precombat+=/food
 actions.precombat+=/augmentation
 # Snapshot raid buffed stats before combat begins and pre-potting is done.
 actions.precombat+=/snapshot_stats
-actions.precombat+=/variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit
-actions.precombat+=/variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit
+actions.precombat+=/variable,name=trinket_1_buffs,value=trinket.1.has_buff.intellect|trinket.1.has_buff.mastery|trinket.1.has_buff.versatility|trinket.1.has_buff.haste|trinket.1.has_buff.crit|trinket.1.is.mirror_of_fractured_tomorrows
+actions.precombat+=/variable,name=trinket_2_buffs,value=trinket.2.has_buff.intellect|trinket.2.has_buff.mastery|trinket.2.has_buff.versatility|trinket.2.has_buff.haste|trinket.2.has_buff.crit|trinket.2.is.mirror_of_fractured_tomorrows
 # Decide which trinket to pair with Dragonrage, prefer 2 minute and 1 minute trinkets
 actions.precombat+=/variable,name=trinket_1_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_1_buffs&(trinket.1.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.1.cooldown.duration=0)
 actions.precombat+=/variable,name=trinket_2_sync,op=setif,value=1,value_else=0.5,condition=variable.trinket_2_buffs&(trinket.2.cooldown.duration%%cooldown.dragonrage.duration=0|cooldown.dragonrage.duration%%trinket.2.cooldown.duration=0)
 # Estimates a trinkets value by comparing the cooldown of the trinket, divided by the duration of the buff it provides. Has a intellect modifier (currently 1.5x) to give a higher priority to intellect trinkets. The intellect modifier should be changed as intellect priority increases or decreases. As well as a modifier for if a trinket will or will not sync with cooldowns.
-actions.precombat+=/variable,name=trinket_1_manual,value=trinket.1.is.spoils_of_neltharus|trinket.1.is.belorrelos_the_suncaller|trinket.1.is.nymues_unraveling_spindle
-actions.precombat+=/variable,name=trinket_2_manual,value=trinket.2.is.spoils_of_neltharus|trinket.2.is.belorrelos_the_suncaller|trinket.2.is.nymues_unraveling_spindle
+actions.precombat+=/variable,name=trinket_1_manual,value=trinket.1.is.belorrelos_the_suncaller
+#|trinket.1.is.nymues_unraveling_spindle
+actions.precombat+=/variable,name=trinket_2_manual,value=trinket.2.is.belorrelos_the_suncaller
+#|trinket.2.is.nymues_unraveling_spindle
 actions.precombat+=/variable,name=trinket_1_exclude,value=trinket.1.is.ruby_whelp_shell|trinket.1.is.whispering_incarnate_icon
 actions.precombat+=/variable,name=trinket_2_exclude,value=trinket.2.is.ruby_whelp_shell|trinket.2.is.whispering_incarnate_icon
 actions.precombat+=/variable,name=trinket_priority,op=setif,value=2,value_else=1,condition=!variable.trinket_1_buffs&variable.trinket_2_buffs|variable.trinket_2_buffs&((trinket.2.cooldown.duration%trinket.2.proc.any_dps.duration)*(1.5+trinket.2.has_buff.intellect)*(variable.trinket_2_sync))>((trinket.1.cooldown.duration%trinket.1.proc.any_dps.duration)*(1.5+trinket.1.has_buff.intellect)*(variable.trinket_1_sync))
@@ -29,6 +31,8 @@ actions.precombat+=/variable,name=dr_prep_time_aoe,default=4,op=reset
 actions.precombat+=/variable,name=dr_prep_time_st,default=13,op=reset
 actions.precombat+=/variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
 actions.precombat+=/use_item,name=shadowed_orb_of_torment
+# Get Scarlet Adaptation
+actions.precombat+=/verdant_embrace,if=talent.scarlet_adaptation
 actions.precombat+=/firestorm,if=talent.firestorm
 actions.precombat+=/living_flame,if=!talent.firestorm
 
@@ -138,19 +142,16 @@ actions.st+=/living_flame,if=!buff.dragonrage.up|(buff.iridescence_red.remains>e
 # Fallback for movement
 actions.st+=/azure_strike
 
-# Use spoils along with Dragon Rage when both FB & SS is on CD on <=2T or immediately on >=3T
-actions.trinkets=use_item,name=spoils_of_neltharus,if=buff.dragonrage.up&(!cooldown.fire_breath.up&!cooldown.shattering_star.up|active_enemies>=3)|fight_remains<=20
+# Use Dreambinder on CD
 actions.trinkets+=/use_item,name=dreambinder_loom_of_the_great_cycle
-# Use nymues before we go into our cooldowns
-actions.trinkets+=/use_item,name=nymues_unraveling_spindle,if=cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35|fight_remains<=20
 # Fit in a Burnout/Green spell/Azure strike as you cast belorrelos for the "free" GCD
 actions.trinkets+=/use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|cooldown.dragonrage.remains>=20&!buff.dragonrage.up|variable.trinket_2_buffs&trinket.2.cooldown.remains>=20|variable.trinket_1_buffs&trinket.1.cooldown.remains>=20|(!variable.trinket_1_buffs|trinket.1.cooldown.duration=0)&(!variable.trinket_2_buffs|trinket.2.cooldown.duration=0))&gcd.remains>0.3|fight_remains<=20
 actions.trinkets+=/living_flame,if=buff.burnout.up&(!variable.trinket_1_buffs&!variable.trinket_2_buffs|cooldown.dragonrage.remains>=20&!buff.dragonrage.up|variable.trinket_2_buffs&trinket.2.cooldown.remains>=20|variable.trinket_1_buffs&trinket.1.cooldown.remains>=20)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready
 actions.trinkets+=/call_action_list,name=green,if=talent.ancient_flame&(!variable.trinket_1_buffs&!variable.trinket_2_buffs|cooldown.dragonrage.remains>=20&!buff.dragonrage.up|variable.trinket_2_buffs&trinket.2.cooldown.remains>=20|variable.trinket_1_buffs&trinket.1.cooldown.remains>=20)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&!buff.dragonrage.up
 actions.trinkets+=/azure_strike,if=(!variable.trinket_1_buffs&!variable.trinket_2_buffs|cooldown.dragonrage.remains>=20&!buff.dragonrage.up|variable.trinket_2_buffs&trinket.2.cooldown.remains>=20|variable.trinket_1_buffs&trinket.1.cooldown.remains>=20)&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&!buff.dragonrage.up
 # The trinket with the highest estimated value, will be used first and paired with Dragonrage.
-actions.trinkets+=/use_item,slot=trinket1,if=buff.dragonrage.up&((!cooldown.fire_breath.up&!cooldown.shattering_star.up)|active_enemies>=3|(buff.dragonrage.remains+4*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18))&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
-actions.trinkets+=/use_item,slot=trinket2,if=buff.dragonrage.up&((!cooldown.fire_breath.up&!cooldown.shattering_star.up)|active_enemies>=3|(buff.dragonrage.remains+4*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18))&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
+actions.trinkets+=/use_item,slot=trinket1,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=2)|active_enemies>=3|(buff.dragonrage.remains+4*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18))&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)
+actions.trinkets+=/use_item,slot=trinket2,if=buff.dragonrage.up&((buff.emerald_trance_stacking.stack>=2)|active_enemies>=3|(buff.dragonrage.remains+4*(cooldown.eternity_surge.remains<=gcd.max*2+cooldown.fire_breath.remains<=gcd.max*2)<=18))&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)
 # If only one on use trinket provides a buff, use the other on cooldown. Or if neither trinket provides a buff, use both on cooldown.
 actions.trinkets+=/use_item,slot=trinket1,if=!variable.trinket_1_buffs&(trinket.2.cooldown.remains|!variable.trinket_2_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_1_manual
 actions.trinkets+=/use_item,slot=trinket2,if=!variable.trinket_2_buffs&(trinket.1.cooldown.remains|!variable.trinket_1_buffs)&(variable.next_dragonrage>20|!talent.dragonrage)&!variable.trinket_2_manual
