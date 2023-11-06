@@ -1,10 +1,3 @@
-# This default action priority list is automatically created based on your character.
-# It is a attempt to provide you with a action list that is both simple and practicable,
-# while resulting in a meaningful and good simulation. It may not result in the absolutely highest possible dps.
-# Feel free to edit, adapt and improve it to your own needs.
-# SimulationCraft is always looking for updates and improvements to the default action lists.
-
-# Executed before combat begins. Accepts non-harmful actions only.
 actions.precombat=flask
 actions.precombat+=/food
 actions.precombat+=/augmentation
@@ -148,7 +141,7 @@ actions.trinkets=use_item,name=dreambinder_loom_of_the_great_cycle
 actions.trinkets+=/use_item,name=nymues_unraveling_spindle,if=((buff.emerald_trance_stacking.stack>=2&variable.has_external_pi)|(cooldown.dragonrage.remains<=3&cooldown.fire_breath.remains<7&cooldown.eternity_surge.remains<13&target.time_to_die>=35&!variable.has_external_pi))|fight_remains<=20
 # Belorrelos is used on CD if not playing Nymues, it is used after Nymues if it is played.
 actions.trinkets+=/use_item,name=belorrelos_the_suncaller,use_off_gcd=1,if=(gcd.remains>0.5&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle))|fight_remains<=20
-# Fit in a Burnout/Green spell/Azure strike as you cast belorrelos for the "free" GCD
+# Fit in a Burnout/Green spell/Azure strike as you cast belorrelos for the 'free' GCD
 actions.trinkets+=/living_flame,if=buff.burnout.up&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
 actions.trinkets+=/call_action_list,name=green,if=talent.ancient_flame&equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
 actions.trinkets+=/azure_strike,if=equipped.belorrelos_the_suncaller&trinket.belorrelos_the_suncaller.cooldown.remains<=gcd.max&cooldown.item_cd_1141.ready&(trinket.nymues_unraveling_spindle.cooldown.remains|!equipped.nymues_unraveling_spindle)
